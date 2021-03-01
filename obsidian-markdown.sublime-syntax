@@ -1,0 +1,63 @@
+%YAML 1.2
+---
+name: Obsidian Markdown
+file_extensions: [md, MD]
+scope: source.obsidian-markdown
+
+contexts:
+  main:
+    - match: "\\[\\["
+      push: note_link
+
+    - match: "\\*\\*"
+      push: strong
+
+    - match: "\\*"
+      push: em
+
+    - match: "^[\\s]*-"
+      scope: markup.list.unnumbered
+
+    - match: "#{1,4} .*"
+      scope: markup.heading
+
+    - match: "https?:[^\\s]+"
+      scope: markup.underline.link
+
+    - match: "!\\[.*?\\]\\(.*?\\)"
+      scope: markup.underline.link
+
+    - match: "\\[.*?\\]\\(.*?\\)"
+      scope: markup.underline.link
+
+    - match: "```"
+      push: code_block
+
+    - match: "`"
+      push: code_inline
+        
+  note_link:
+    - meta_scope: meta.brackets
+    - meta_content_scope: markup.underline.link
+    - match: "\\]\\]"
+      pop: true
+
+  strong:
+    - meta_scope: markup.bold
+    - match: "\\*\\*"
+      pop: true
+
+  em:
+    - meta_scope: markup.italic
+    - match: "\\*"
+      pop: true
+
+  code_block:
+    - meta_scope: markup.raw.block
+    - match: "```"
+      pop: true
+
+  code_inline:
+    - meta_scope: markup.raw.block
+    - match: "`"
+      pop: true
