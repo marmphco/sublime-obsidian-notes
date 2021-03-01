@@ -29,6 +29,7 @@ class ObsidianOpenNoteCommand(sublime_plugin.TextCommand):
         text_pos = self.view.layout_to_text(layout_pos)
         region = self.view.extract_scope(text_pos)
         note = self.view.substr(region)
+        # TODO make this work
         #self.view.window().open_file(self.view.window().folders()[0] + '/' + note + '.md')
 
 class Note:

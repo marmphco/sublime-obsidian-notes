@@ -3,13 +3,5 @@
         "caption": "Open Linked Note",
         "id": "obsidian-notes.open",
         "command": "obsidian_open_note",
-        // "children":
-        // [
-        //     { "command": "new_file", "caption": "New File", "mnemonic": "N" },
-
-        //     { "command": "prompt_open_file", "caption": "Open File…", "mnemonic": "O", "platform": "!OSX" },
-        //     { "command": "prompt_open_folder", "caption": "Open Folder…", "platform": "!OSX" },
-        //     { "command": "prompt_open", "caption": "Open…", "platform": "OSX" }
-        // ]
     }
 ]
