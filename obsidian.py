@@ -4,7 +4,7 @@ import sublime
 import sublime_plugin
 
 def log(msg: str):
-    print("obsidian-notes: " + msg)
+    print("obsidian-notes: " + str(msg))
 
 def collect_links(file):
     pattern = re.compile('\\[\\[.*?\\]\\]')
@@ -32,10 +32,24 @@ class ObsidianOpenNoteCommand(sublime_plugin.TextCommand):
         layout_pos = self.view.window_to_layout((event['x'], event['y']))
         text_pos = self.view.layout_to_text(layout_pos)
         region = self.view.extract_scope(text_pos)
-        note = self.view.substr(region)
-        log(note)
-        # TODO make this work
-        #self.view.window().open_file(self.view.window().folders()[0] + '/' + note + '.md')
+        link = self.view.substr(region)
+
+        # Link format is [[Name#Heading|Alias]]
+        # ignore the heading for now
+        location = link.split('|')[0]
+        note_name = location.split('#')[0]
+
+        log('open ' + note_name)
+
+        # Search for a note with that name in the window's folders
+        # open the first one we find.
+        for folder in self.view.window().folders():
+            for (root, dirs, files) in os.walk(folder):
+                for file in files:
+                    if file.startswith(note_name):
+                        path = os.path.join(root, file)
+                        self.view.window().open_file(path)
+                        return
 
 class Note:
 
@@ -78,7 +92,7 @@ class Index:
             return self.notes[note].links
         return []
 
-    # return the backlinks for a note
+    # return the backlinks for a note (doesn't actually do that yet)
     def backlinks(self, note: Note) -> [str]:
         if note in self.notes:
             return self.notes[note].links
