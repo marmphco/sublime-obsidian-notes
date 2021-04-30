@@ -25,10 +25,11 @@ def note_name_from_link(link: str) -> str:
 def path_to_note(view: sublime.View, note_name: str) -> str:
     # Search for a note with that name in the window's folders
     # Return the first one we find.
+    lower_note_name = note_name.lower()
     for folder in view.window().folders():
         for (root, dirs, files) in os.walk(folder):
             for file in files:
-                if file.startswith(note_name):
+                if file.lower().startswith(lower_note_name):
                     path = os.path.join(root, file)
                     return path
     return None
@@ -39,6 +40,10 @@ def file_extension(path: str) -> str:
         return None
     else:
         return tokens[-1]
+
+# Not comprehensive by any means
+def is_image_extension(extension: str) -> bool:
+    return extension in ['jpg', 'jpeg', 'png', 'gif'];
 
 # Opens [[Links]] to notes
 class ObsidianOpenNoteCommand(sublime_plugin.TextCommand):
@@ -115,6 +120,28 @@ class Index:
             return self.notes[note].links
         return []
 
+# needs to use the correct image width and height
+IMAGE_EMBED_TEMPLATE = '''
+<body id="image-embed">
+    <style>
+        img {{ 
+            width: 200px;
+            height: 200px;
+        }}
+    </style>
+    <img src="file://{}">
+</body>
+'''
+
+NOTE_EMBED_TEMPLATE = '''
+<body id="note-embed">
+    <style>
+    p {{ margin: 0.5rem; }}
+    </style>
+    {}
+</body>
+'''
+
 class ObsidianListener(sublime_plugin.EventListener):
 
     def __init__(self):
@@ -133,13 +160,7 @@ class ObsidianListener(sublime_plugin.EventListener):
 
         return self.indexes[key]
 
-    # sublime_plugin.EventListener Overrides
-
-    # Plugin activation handler
-    def on_activated(self, view):
-        # Update the index associated with the view's window
-        self.index_for_view(view).update(view.window().folders())
-
+    def update_phantoms(self, view):
         # Display phantoms for embeds
         self.phantom_set = sublime.PhantomSet(view)
         phantoms = []
@@ -147,13 +168,33 @@ class ObsidianListener(sublime_plugin.EventListener):
             link = view.substr(region)
             note_name = note_name_from_link(link)
             note_path = path_to_note(view, note_name)
-            
-            if file_extension(note_name) == None:
-                note_content = open(note_path, 'r').read()
+            extension = file_extension(note_name)
+
+            if extension == None:
+                lines = open(note_path, 'r').readlines()
+                note_content = ''.join(['<p>' + line + '</p>' for line in lines])
+                phantom_content = NOTE_EMBED_TEMPLATE.format(note_content)
+                phantom = sublime.Phantom(region, phantom_content, sublime.LAYOUT_BLOCK)
+                phantoms.append(phantom)
+            elif is_image_extension(extension):
+                log('embed jpg')
+                note_content = IMAGE_EMBED_TEMPLATE.format(note_path)
                 phantom = sublime.Phantom(region, note_content, sublime.LAYOUT_BLOCK)
                 phantoms.append(phantom)
 
         self.phantom_set.update(phantoms)
+
+    # sublime_plugin.EventListener Overrides
+
+    # Plugin activation handler
+    def on_activated(self, view):
+        # Update the index associated with the view's window
+        self.index_for_view(view).update(view.window().folders())
+
+        self.update_phantoms(view)
+
+    def on_post_save(self, view):
+        self.update_phantoms(view)
 
     # File load handler
     def on_load(self, view):

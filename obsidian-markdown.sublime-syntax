@@ -45,11 +45,15 @@ contexts:
     - meta_content_scope: markup.underline.link
     - match: "\\]\\]"
       pop: true
+    - match: "\n"
+      pop: true
 
   note_embed:
     - meta_scope: meta.brackets
     - meta_content_scope: markup.raw.block
     - match: "\\]\\]"
+      pop: true
+    - match: "\n"
       pop: true
 
   strong:
