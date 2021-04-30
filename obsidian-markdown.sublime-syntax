@@ -50,7 +50,7 @@ contexts:
 
   note_embed:
     - meta_scope: meta.brackets
-    - meta_content_scope: markup.raw.block
+    - meta_content_scope: markup.underline.link.embed
     - match: "\\]\\]"
       pop: true
     - match: "\n"

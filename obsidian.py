@@ -52,7 +52,7 @@ class ObsidianOpenNoteCommand(sublime_plugin.TextCommand):
         # The command is only enabled within [[ ]]
         layout_pos = self.view.window_to_layout((event['x'], event['y']))
         text_pos = self.view.layout_to_text(layout_pos)
-        return self.view.match_selector(text_pos, 'meta.brackets markup.underline.link') or self.view.match_selector(text_pos, 'meta.brackets markup.raw.block')
+        return self.view.match_selector(text_pos, 'meta.brackets markup.underline.link') or self.view.match_selector(text_pos, 'meta.brackets markup.underline.link.embed')
 
     def want_event(self):
         return True
@@ -164,7 +164,7 @@ class ObsidianListener(sublime_plugin.EventListener):
         # Display phantoms for embeds
         self.phantom_set = sublime.PhantomSet(view)
         phantoms = []
-        for region in view.find_by_selector('meta.brackets markup.raw.block'):
+        for region in view.find_by_selector('meta.brackets markup.underline.link.embed'):
             link = view.substr(region)
             note_name = note_name_from_link(link)
             note_path = path_to_note(view, note_name)
