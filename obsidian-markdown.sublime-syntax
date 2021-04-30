@@ -6,6 +6,10 @@ scope: source.obsidian-markdown
 
 contexts:
   main:
+    
+    - match: "!\\[\\["
+      push: note_embed
+
     - match: "\\[\\["
       push: note_link
 
@@ -39,6 +43,12 @@ contexts:
   note_link:
     - meta_scope: meta.brackets
     - meta_content_scope: markup.underline.link
+    - match: "\\]\\]"
+      pop: true
+
+  note_embed:
+    - meta_scope: meta.brackets
+    - meta_content_scope: markup.raw.block
     - match: "\\]\\]"
       pop: true
 
