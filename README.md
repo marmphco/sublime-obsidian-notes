@@ -10,5 +10,5 @@ An attempt to make a sublime plugin for editing a Obisidian notes vault.
 
 ### What's missing
 
-- Opening block reference `(())` links
+- Opening block reference `^` links
 - Opening standard markdown `[]()` links
