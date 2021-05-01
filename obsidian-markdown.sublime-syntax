@@ -19,6 +19,9 @@ contexts:
     - match: "\\*"
       push: em
 
+    - match: "^>"
+      push: blockquote
+
     - match: "^[\\s]*-"
       scope: markup.list.unnumbered
 
@@ -64,6 +67,11 @@ contexts:
   em:
     - meta_scope: markup.italic
     - match: "\\*"
+      pop: true
+
+  blockquote:
+    - meta_scope: markup.raw.block
+    - match: "\\n"
       pop: true
 
   code_block:
